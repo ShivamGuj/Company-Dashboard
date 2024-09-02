@@ -6,6 +6,6 @@
 ### npm install (install dependencies)
 ### npm run dev
 
-### Live link : 
+### Live link : https://company-dashboard-navy.vercel.app/
 
 #### I hope you like it!!
