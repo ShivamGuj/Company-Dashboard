@@ -13,21 +13,18 @@ export default NextAuth({
       async authorize(credentials) {
         try {
           await dbConnect();
-
           const user = await User.findOne({ email: credentials.email }).lean();
-
           if (!user) {
             throw new Error("No user found with this email");
           }
-
-          const isValidPassword = await compare(credentials.password, user.password);
+          const isValidPassword = await compare(
+            credentials.password,
+            user.password
+          );
           if (!isValidPassword) {
             throw new Error("Invalid password");
           }
-
-          // Returning only necessary user info to minimize data transfer
           return { id: user._id, name: user.name, email: user.email };
-
         } catch (error) {
           console.error("Error in authorization:", error.message);
           throw new Error(error.message || "Internal server error");
@@ -35,7 +32,7 @@ export default NextAuth({
       },
     }),
   ],
-  secret: process.env.SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/auth/login",
     error: "/auth/error",

@@ -41,7 +41,10 @@ export default function Login() {
 
   return (
     <div className="flex justify-center mt-[10vw] h-fit">
-      <form className="p-6 bg-white shadow-md rounded-lg" onSubmit={(e) => e.preventDefault()}>
+      <form
+        className="p-6 bg-white shadow-md rounded-lg"
+        onSubmit={(e) => e.preventDefault()}
+      >
         <h2 className="text-2xl mb-4">Sign In</h2>
         {error && <p className="text-red-500">{error}</p>}
         <input

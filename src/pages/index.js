@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
-import CompanyCard from '../components/CompanyCard';
-import { useSession } from 'next-auth/react';
+import { useEffect, useState } from "react";
+import CompanyCard from "../components/CompanyCard";
+import { useSession } from "next-auth/react";
 
 export default function HomePage() {
   const { data: session } = useSession();
   const [companies, setCompanies] = useState([]);
 
   useEffect(() => {
-    fetch('https://dummy-json.mock.beeceptor.com/companies')
+    fetch("https://dummy-json.mock.beeceptor.com/companies")
       .then((response) => response.json())
       .then((data) => setCompanies(data));
   }, []);
@@ -27,4 +27,3 @@ export default function HomePage() {
     </div>
   );
 }
-
