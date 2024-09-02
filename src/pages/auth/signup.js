@@ -6,10 +6,18 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    if (!name || !email || !password) {
+      setError("Please fill all fields.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch("/api/auth/signup", {
@@ -21,7 +29,8 @@ export default function SignUp() {
       });
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        const message = await response.text();
+        throw new Error(message || "Sign up failed. Please try again.");
       }
 
       const data = await response.json();
@@ -29,7 +38,9 @@ export default function SignUp() {
       router.push("/auth/login");
     } catch (error) {
       console.error("Error during sign up:", error);
-      alert("Sign up failed. Please try again.");
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,8 +77,12 @@ export default function SignUp() {
           required
         />
         <div className="flex justify-center">
-          <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white p-2 rounded border shadow">
-            Sign Up
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-500 text-white p-2 rounded border shadow"
+            disabled={loading}
+          >
+            {loading ? "Signing Up..." : "Sign Up"}
           </button>
         </div>
       </form>

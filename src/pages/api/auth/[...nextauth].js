@@ -3,30 +3,50 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import dbConnect from "../../../lib/db";
 import User from "../../../model/user";
 import { compare } from "bcryptjs";
-import dotenv from "dotenv";dotenv.config();
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export default NextAuth({
   providers: [
     CredentialsProvider({
       async authorize(credentials) {
-        await dbConnect();
-        const user = await User.findOne({ email: credentials.email });
-        if (!user) {
-          throw new Error("No user found");
-        }
+        try {
+          await dbConnect();
 
-        const isValid = await compare(credentials.password, user.password);
-        if (!isValid) {
-          throw new Error("Invalid password");
-        }
+          const user = await User.findOne({ email: credentials.email }).lean();
 
-        return { id: user._id, name: user.name, email: user.email };
+          if (!user) {
+            throw new Error("No user found with this email");
+          }
+
+          const isValidPassword = await compare(credentials.password, user.password);
+          if (!isValidPassword) {
+            throw new Error("Invalid password");
+          }
+
+          // Returning only necessary user info to minimize data transfer
+          return { id: user._id, name: user.name, email: user.email };
+
+        } catch (error) {
+          console.error("Error in authorization:", error.message);
+          throw new Error(error.message || "Internal server error");
+        }
       },
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.SECRET,
   pages: {
     signIn: "/auth/login",
     error: "/auth/error",
+  },
+  callbacks: {
+    async session({ session, token }) {
+      session.user.id = token.sub;
+      return session;
+    },
+  },
+  session: {
+    strategy: "jwt",
   },
 });
